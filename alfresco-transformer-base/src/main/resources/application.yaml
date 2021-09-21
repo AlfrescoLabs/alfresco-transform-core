@@ -53,4 +53,7 @@ management:
 
 container:
   name: ${HOSTNAME:t-engine}
+grpc:
+  server:
+    port: 9095
 

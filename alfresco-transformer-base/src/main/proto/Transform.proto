@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.alfresco.transformer.grpc";
+option java_outer_classname = "TransformProto";
+option objc_class_prefix = "TRF";
+
+package grpc;
+
+// The greeting service definition.
+service TransformService {
+  // Sends a greeting
+  rpc transform (TransformRequest) returns (TransformReply) {}
+}
+
+// The request message containing the user's name.
+message TransformRequest {
+  string requestId = 1;
+  string sourceReference = 2;
+  string sourceMediaType = 3;
+  int64 sourceSize = 4;
+  string sourceExtension =5;
+  string targetMediaType = 6;
+  string targetExtension = 7;
+  string clientData = 8;
+  int32 schema = 9;
+  map<string, string> transformRequestOptions = 10;
+  InternalContext internalContext = 11;
+  MultipartFile file = 12;
+}
+
+message InternalContext {
+   MultiStep multiStep = 1;
+   int32 attemptedRetries = 2;
+   string currentSourceMediaType = 3;
+   string currentTargetMediaType = 4;
+   string replyToDestination = 5;
+   int64 currentSourceSize = 6;
+   map<string, string> transformRequestOptions = 7;
+}
+message MultiStep {
+  string initialRequestId = 1;
+  string initialSourceMediaType = 2;
+  List transformsToBeDone = 3;
+}
+message List {
+  repeated string value = 1;
+}
+
+message MultipartFile {
+  bytes file = 1;
+  string orginalFileName = 2;
+  int32 size =3;
+}
+
+// The response message containing the transform response
+message TransformReply {
+  string requestId =1;
+  int32 status =2 ;
+  string errorDetails = 3;
+  string sourceReference = 4;
+  string targetReference = 5;
+  string clientData = 6;
+  int32 schema = 7;
+  InternalContext internalContext = 8;
+  bytes file = 9;
+}
