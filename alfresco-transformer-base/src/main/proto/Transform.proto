@@ -27,6 +27,9 @@ message TransformRequest {
   map<string, string> transformRequestOptions = 10;
   InternalContext internalContext = 11;
   MultipartFile file = 12;
+  string originalFileName = 13;
+  string sourceMimeType = 14;
+  string targetMimeType = 15;
 }
 
 message InternalContext {

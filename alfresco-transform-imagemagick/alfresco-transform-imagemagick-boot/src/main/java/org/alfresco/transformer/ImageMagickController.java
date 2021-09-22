@@ -104,7 +104,7 @@ public class  ImageMagickController extends AbstractTransformerController
     public ProbeTestTransform getProbeTestTransform()
     {
         // See the Javadoc on this method and Probes.md for the choice of these values.
-        return new ProbeTestTransform(this, "quick.jpg", "quick.png",
+        return new ProbeTestTransform("quick.jpg", "quick.png",
             35593, 1024, 150, 1024, 60 * 15 + 1, 60 * 15)
         {
             @Override

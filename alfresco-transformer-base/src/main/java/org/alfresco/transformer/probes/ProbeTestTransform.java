@@ -120,7 +120,7 @@ public abstract class ProbeTestTransform
      * @param maxTransformSeconds            default values normally supplied by helm. Not identical so we can be sure which value is used.
      * @param livenessTransformPeriodSeconds default values normally supplied by helm. Not identical so we can be sure which value is used.
      */
-    public ProbeTestTransform(AbstractTransformerController controller,
+    public ProbeTestTransform(
         String sourceFilename, String targetFilename, long expectedLength, long plusOrMinus,
         int livenessPercent, long maxTransforms, long maxTransformSeconds,
         long livenessTransformPeriodSeconds)

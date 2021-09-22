@@ -105,7 +105,7 @@ public class LibreOfficeController extends AbstractTransformerController
     public ProbeTestTransform getProbeTestTransform()
     {
         // See the Javadoc on this method and Probes.md for the choice of these values.
-        return new ProbeTestTransform(this, "quick.doc", "quick.pdf",
+        return new ProbeTestTransform( "quick.doc", "quick.pdf",
             11817, 1024, 150, 10240, 60 * 30 + 1, 60 * 15 + 20)
         {
             @Override

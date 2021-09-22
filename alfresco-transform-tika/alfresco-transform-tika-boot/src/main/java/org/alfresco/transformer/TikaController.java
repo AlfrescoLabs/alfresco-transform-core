@@ -92,7 +92,7 @@ public class TikaController extends AbstractTransformerController
     {
         // See the Javadoc on this method and Probes.md for the choice of these values.
         // the livenessPercentage is a little large as Tika does tend to suffer from slow transforms that class with a gc.
-        return new ProbeTestTransform(this, "quick.pdf", "quick.txt",
+        return new ProbeTestTransform( "quick.pdf", "quick.txt",
             60, 16, 400, 10240, 60 * 30 + 1, 60 * 15 + 20)
         {
             @Override
@@ -107,6 +107,7 @@ public class TikaController extends AbstractTransformerController
     public void transformImpl(String transformName, String sourceMimetype, String targetMimetype,
                                  Map<String, String> transformOptions, File sourceFile, File targetFile)
     {
+        logger.info("inside tika grpc transform service");
         transformOptions.put(TRANSFORM_NAME_PARAMETER, transformName);
         javaExecutor.transform(sourceMimetype, targetMimetype, transformOptions, sourceFile, targetFile);
     }

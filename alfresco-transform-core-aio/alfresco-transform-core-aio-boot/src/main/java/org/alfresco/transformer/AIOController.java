@@ -73,7 +73,7 @@ public class AIOController extends AbstractTransformerController
     {
         // HtmlParserContentTransformer html -> text
         // See the Javadoc on this method and Probes.md for the choice of these values.
-        return new ProbeTestTransform(this, "quick.html", "quick.txt",
+        return new ProbeTestTransform( "quick.html", "quick.txt",
             119, 30, 150, 1024,
             60 * 2 + 1, 60 * 2)
         {
