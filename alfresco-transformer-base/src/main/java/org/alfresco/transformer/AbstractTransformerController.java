@@ -162,6 +162,7 @@ public abstract class AbstractTransformerController implements TransformControll
                     + "targetExtension: '{}', requestParameters: {}", sourceMimetype, targetMimetype, targetExtension, requestParameters);
         }
 
+        logger.info("inside rest transform service, request " + sourceMultipartFile.getOriginalFilename());
         final String targetFilename = createTargetFileName(
                 sourceMultipartFile.getOriginalFilename(), targetExtension);
         getProbeTestTransform().incrementTransformerCount();
@@ -435,10 +436,12 @@ public abstract class AbstractTransformerController implements TransformControll
         // The transformOptions always contains sourceEncoding when sent to a T-Engine, even though it should not be
         // used to select a transformer. Similar to source and target mimetypes and extensions, but these are not
         // passed in transformOptions.
+
         String sourceEncoding = transformOptions.remove(SOURCE_ENCODING);
         try
         {
             final long sourceSizeInBytes = sourceFile.length();
+            logger.info("sourceMimetype, sourceSizeInBytes, targetMimetype:" + sourceMimetype + ", " + sourceSizeInBytes + ", " + targetMimetype);
             final String transformerName = transformRegistry.findTransformerName(sourceMimetype,
                     sourceSizeInBytes, targetMimetype, transformOptions, null);
             if (transformerName == null)

@@ -7,13 +7,13 @@ option objc_class_prefix = "TRF";
 
 package grpc;
 
-// The greeting service definition.
+// The transform service definition.
 service TransformService {
-  // Sends a greeting
+  // Sends a transform request
   rpc transform (TransformRequest) returns (TransformReply) {}
 }
 
-// The request message containing the user's name.
+// The transform request message
 message TransformRequest {
   string requestId = 1;
   string sourceReference = 2;

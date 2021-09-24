@@ -24,17 +24,13 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.alfresco.transformer.fs.FileManager.createTargetFileName;
 import static org.alfresco.transformer.util.RequestParamMap.SOURCE_ENCODING;
-import static org.alfresco.transformer.util.RequestParamMap.SOURCE_EXTENSION;
-import static org.alfresco.transformer.util.RequestParamMap.SOURCE_MIMETYPE;
-import static org.alfresco.transformer.util.RequestParamMap.TARGET_EXTENSION;
-import static org.alfresco.transformer.util.RequestParamMap.TARGET_MIMETYPE;
-import static org.alfresco.transformer.util.RequestParamMap.TEST_DELAY;
-import static org.alfresco.transformer.util.RequestParamMap.TRANSFORM_NAME_PROPERTY;
+
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INSUFFICIENT_STORAGE;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -45,15 +41,6 @@ import static org.springframework.util.StringUtils.getFilename;
 public abstract class AbstractTransformGrpcService extends TransformServiceGrpc.TransformServiceImplBase
 {
 
-    // Request parameters that are not part of transform options
-    public static final List<String> NON_TRANSFORM_OPTION_REQUEST_PARAMETERS = Arrays.asList(SOURCE_EXTENSION,
-                TARGET_EXTENSION, TARGET_MIMETYPE, SOURCE_MIMETYPE, TEST_DELAY, TRANSFORM_NAME_PROPERTY);
-
-    @Autowired
-    private AlfrescoSharedFileStoreClient alfrescoSharedFileStoreClient;
-
-    @Autowired
-    private TransformRequestValidator transformRequestValidator;
 
     @Autowired
     private TransformServiceRegistry transformRegistry;
@@ -61,21 +48,30 @@ public abstract class AbstractTransformGrpcService extends TransformServiceGrpc.
     private static final Logger logger = LoggerFactory.getLogger(
                 AbstractTransformGrpcService.class);
 
-    @Override
+
+    public abstract String getTransformerName();
+
+
+    public abstract String version();
+
+    public abstract  void transform(org.alfresco.transformer.grpc.TransformRequest request,
+                io.grpc.stub.StreamObserver<org.alfresco.transformer.grpc.TransformReply> responseObserver);
+
     public void transform(org.alfresco.transformer.grpc.TransformRequest request,
-                io.grpc.stub.StreamObserver<org.alfresco.transformer.grpc.TransformReply> responseObserver) {
+                io.grpc.stub.StreamObserver<org.alfresco.transformer.grpc.TransformReply> responseObserver, TransformServiceRegistry transformRegistry) {
 
 
+        this.transformRegistry = transformRegistry;
 
-        logger.info("inside grpc transform service");
+        logger.info("inside grpc transform service, request " + request.getOriginalFileName());
         final String targetFilename = createTargetFileName(
                     request.getOriginalFileName(), request.getTargetExtension());
         getProbeTestTransform().incrementTransformerCount();
         final File sourceFile = createSourceFile(request);
         final File targetFile = createTargetFile(targetFilename);
 
-        Map<String, String> transformOptions = request.getTransformRequestOptionsMap();
-       String transformName = getTransformerName(request.getSourceMimeType(), request.getTargetMimeType(),"", sourceFile, transformOptions);
+        Map<String, String> transformOptions = new HashMap<>(request.getTransformRequestOptionsMap());
+       String transformName = getTransformerName(request.getSourceMimeType(), request.getTargetMimeType(),null, sourceFile, transformOptions);
        transformImpl(transformName, request.getSourceMimeType(), request.getTargetMimeType(), transformOptions, sourceFile, targetFile);
 
         LogEntry.setTargetSize(targetFile.length());
@@ -151,10 +147,13 @@ public abstract class AbstractTransformGrpcService extends TransformServiceGrpc.
         // The transformOptions always contains sourceEncoding when sent to a T-Engine, even though it should not be
         // used to select a transformer. Similar to source and target mimetypes and extensions, but these are not
         // passed in transformOptions.
+
         String sourceEncoding = transformOptions.remove(SOURCE_ENCODING);
         try
         {
             final long sourceSizeInBytes = sourceFile.length();
+            logger.info("sourceMimetype, sourceSizeInBytes, targetMimetype:" + sourceMimetype + ", " + sourceSizeInBytes + ", " + targetMimetype
+            );
             final String transformerName = transformRegistry.findTransformerName(sourceMimetype, sourceSizeInBytes,
                         targetMimetype, transformOptions, null);
             if (transformerName == null)
